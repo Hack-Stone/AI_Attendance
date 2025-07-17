@@ -30,6 +30,15 @@ const teacherResponses = {
   ]
 };
 
+export const processMessage = (message: string): ChatMessage => {
+  const user = getCurrentUser();
+  
+  if (user?.role === 'teacher') {
+    return processTeacherMessage(message);
+  } else {
+    return processStudentMessage(message);
+  }
+};
 const studentResponses = {
   greeting: [
     "Hello! I'm your personal AI study assistant. How can I help you with your Computer Science studies today?",
