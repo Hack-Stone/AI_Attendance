@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, User, TrendingUp } from 'lucide-react';
 import { ChatMessage } from '../types';
 import { processMessage } from '../utils/chatbot';
+import { getCurrentUser } from '../utils/auth';
+import { User as UserType } from '../types';
 
 interface ChatBotProps {
   isOpen: boolean;
@@ -9,6 +11,7 @@ interface ChatBotProps {
 }
 
 export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
+  const [user, setUser] = useState<UserType | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -21,6 +24,10 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
