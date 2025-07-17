@@ -75,8 +75,8 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-end p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md h-[600px] flex flex-col border border-gray-200">
+    <div className="fixed inset-0 z-50 flex items-end justify-end p-2 lg:p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm lg:max-w-md h-[500px] lg:h-[600px] flex flex-col border border-gray-200">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-2xl">
           <div className="flex items-center space-x-3">
@@ -86,7 +86,9 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
             </div>
             <div>
               <h3 className="font-semibold">AI Assistant</h3>
-              <p className="text-xs opacity-90">Powered by Machine Learning</p>
+              <p className="text-xs opacity-90">
+                {user?.role === 'teacher' ? 'Teaching Assistant' : 'Student Helper'}
+              </p>
             </div>
           </div>
           <button
@@ -98,13 +100,13 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-3 lg:space-y-4">
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} max-w-full`}
             >
-              <div className={`flex items-start space-x-2 max-w-[80%] ${
+              <div className={`flex items-start space-x-2 max-w-[85%] ${
                 message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
               }`}>
                 <div className={`p-2 rounded-full ${
@@ -114,17 +116,17 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
                 }`}>
                   {message.sender === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                 </div>
-                <div className={`p-3 rounded-2xl ${
+                <div className={`p-2 lg:p-3 rounded-2xl ${
                   message.sender === 'user'
                     ? 'bg-blue-500 text-white rounded-tr-md'
                     : 'bg-gray-100 text-gray-800 rounded-tl-md'
                 }`}>
                   {message.type === 'list' && message.data ? (
                     <div>
-                      <p className="mb-2">{message.message}</p>
+                      <p className="mb-2 text-sm">{message.message}</p>
                       <div className="space-y-1">
                         {message.data.map((student: any) => (
-                          <div key={student.id} className="text-sm p-2 bg-white/10 rounded-lg">
+                          <div key={student.id} className="text-xs lg:text-sm p-2 bg-white/10 rounded-lg">
                             <span className="font-medium">{student.name}</span> - {student.attendancePercentage}%
                           </div>
                         ))}
@@ -159,14 +161,14 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
 
         {/* Quick Questions */}
         {messages.length <= 1 && (
-          <div className="px-4 pb-2">
+          <div className="px-3 lg:px-4 pb-2">
             <p className="text-xs text-gray-500 mb-2">Quick questions:</p>
             <div className="grid grid-cols-2 gap-2">
               {quickQuestions.map((question, index) => (
                 <button
                   key={index}
                   onClick={() => handleQuickQuestion(question)}
-                  className="text-xs p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-left"
+                  className="text-xs p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-left break-words"
                 >
                   {question}
                 </button>
@@ -176,20 +178,20 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
         )}
 
         {/* Input */}
-        <div className="p-4 border-t">
+        <div className="p-3 lg:p-4 border-t">
           <div className="flex items-center space-x-2">
             <input
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask me about attendance..."
-              className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder={user?.role === 'teacher' ? "Ask about students..." : "Ask about your studies..."}
+              className="flex-1 p-2 lg:p-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <button
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || isTyping}
-              className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="p-2 lg:p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               <Send className="h-4 w-4" />
             </button>

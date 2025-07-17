@@ -12,7 +12,8 @@ import {
   BookOpen,
   GraduationCap,
   Award,
-  Activity
+  Activity,
+  XCircle
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { mockStudents } from '../utils/mockData';
@@ -29,12 +30,29 @@ export const Dashboard: React.FC = () => {
     else setTimeOfDay('Good Evening');
   }, []);
 
-  // Calculate statistics
-  const totalStudents = mockStudents.length;
-  const presentToday = mockStudents.filter(s => Math.random() > 0.2).length;
-  const absentToday = totalStudents - presentToday;
-  const defaulters = mockStudents.filter(s => s.attendance_percentage < 75).length;
-  const avgAttendance = Math.round(mockStudents.reduce((sum, s) => sum + s.attendance_percentage, 0) / totalStudents);
+  // Calculate statistics based on user role
+  const getStatistics = () => {
+    if (user?.role === 'teacher') {
+      const totalStudents = mockStudents.length;
+      const presentToday = mockStudents.filter(s => Math.random() > 0.2).length;
+      const absentToday = totalStudents - presentToday;
+      const defaulters = mockStudents.filter(s => s.attendance_percentage < 75).length;
+      const avgAttendance = Math.round(mockStudents.reduce((sum, s) => sum + s.attendance_percentage, 0) / totalStudents);
+      
+      return { totalStudents, presentToday, absentToday, defaulters, avgAttendance };
+    } else {
+      // Student statistics
+      const currentStudent = mockStudents.find(s => s.student_id === user?.student_id) || mockStudents[0];
+      return {
+        totalClasses: currentStudent.total_classes,
+        attendedClasses: currentStudent.attended_classes,
+        attendancePercentage: currentStudent.attendance_percentage,
+        missedClasses: currentStudent.total_classes - currentStudent.attended_classes
+      };
+    }
+  };
+
+  const stats = getStatistics();
 
   // Chart data
   const weeklyData = [
@@ -68,49 +86,97 @@ export const Dashboard: React.FC = () => {
     { name: 'Poor (&lt;60%)', value: mockStudents.filter(s => s.attendance_percentage < 60).length, color: '#EF4444' }
   ];
 
-  const stats = [
-    {
-      title: 'Total Students',
-      value: totalStudents,
-      icon: Users,
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'bg-blue-50',
-      iconColor: 'text-blue-600',
-      trend: '+5%',
-      trendColor: 'text-green-600'
-    },
-    {
-      title: 'Present Today',
-      value: presentToday,
-      icon: CheckCircle,
-      color: 'from-green-500 to-green-600',
-      bgColor: 'bg-green-50',
-      iconColor: 'text-green-600',
-      trend: '+2%',
-      trendColor: 'text-green-600'
-    },
-    {
-      title: 'Absent Today',
-      value: absentToday,
-      icon: UserX,
-      color: 'from-red-500 to-red-600',
-      bgColor: 'bg-red-50',
-      iconColor: 'text-red-600',
-      trend: '-3%',
-      trendColor: 'text-red-600'
-    },
-    {
-      title: 'Avg Attendance',
-      value: `${avgAttendance}%`,
-      icon: Target,
-      color: 'from-purple-500 to-purple-600',
-      bgColor: 'bg-purple-50',
-      iconColor: 'text-purple-600',
-      trend: '+1.2%',
-      trendColor: 'text-green-600'
+  const getStatsCards = () => {
+    if (user?.role === 'teacher') {
+      return [
+        {
+          title: 'Total Students',
+          value: stats.totalStudents,
+          icon: Users,
+          color: 'from-blue-500 to-blue-600',
+          bgColor: 'bg-blue-50',
+          iconColor: 'text-blue-600',
+          trend: '+5%',
+          trendColor: 'text-green-600'
+        },
+        {
+          title: 'Present Today',
+          value: stats.presentToday,
+          icon: CheckCircle,
+          color: 'from-green-500 to-green-600',
+          bgColor: 'bg-green-50',
+          iconColor: 'text-green-600',
+          trend: '+2%',
+          trendColor: 'text-green-600'
+        },
+        {
+          title: 'Absent Today',
+          value: stats.absentToday,
+          icon: UserX,
+          color: 'from-red-500 to-red-600',
+          bgColor: 'bg-red-50',
+          iconColor: 'text-red-600',
+          trend: '-3%',
+          trendColor: 'text-red-600'
+        },
+        {
+          title: 'Avg Attendance',
+          value: `${stats.avgAttendance}%`,
+          icon: Target,
+          color: 'from-purple-500 to-purple-600',
+          bgColor: 'bg-purple-50',
+          iconColor: 'text-purple-600',
+          trend: '+1.2%',
+          trendColor: 'text-green-600'
+        }
+      ];
+    } else {
+      return [
+        {
+          title: 'Total Classes',
+          value: stats.totalClasses,
+          icon: BookOpen,
+          color: 'from-blue-500 to-blue-600',
+          bgColor: 'bg-blue-50',
+          iconColor: 'text-blue-600',
+          trend: 'This semester',
+          trendColor: 'text-gray-600'
+        },
+        {
+          title: 'Classes Attended',
+          value: stats.attendedClasses,
+          icon: CheckCircle,
+          color: 'from-green-500 to-green-600',
+          bgColor: 'bg-green-50',
+          iconColor: 'text-green-600',
+          trend: 'Good progress',
+          trendColor: 'text-green-600'
+        },
+        {
+          title: 'Classes Missed',
+          value: stats.missedClasses,
+          icon: XCircle,
+          color: 'from-red-500 to-red-600',
+          bgColor: 'bg-red-50',
+          iconColor: 'text-red-600',
+          trend: 'Keep improving',
+          trendColor: 'text-red-600'
+        },
+        {
+          title: 'Attendance Rate',
+          value: `${stats.attendancePercentage}%`,
+          icon: Target,
+          color: 'from-purple-500 to-purple-600',
+          bgColor: 'bg-purple-50',
+          iconColor: 'text-purple-600',
+          trend: stats.attendancePercentage >= 75 ? 'Above minimum' : 'Below minimum',
+          trendColor: stats.attendancePercentage >= 75 ? 'text-green-600' : 'text-red-600'
+        }
+      ];
     }
-  ];
+  };
 
+  const statsCards = getStatsCards();
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -161,27 +227,27 @@ export const Dashboard: React.FC = () => {
       {/* Stats Grid */}
       <motion.div 
         variants={itemVariants}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6"
       >
-        {stats.map((stat, index) => {
+        {statsCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <motion.div
               key={index}
               whileHover={{ scale: 1.02, y: -5 }}
-              className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300"
+              className="bg-white rounded-2xl p-4 lg:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300"
             >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
-                  <p className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</p>
+                  <p className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{stat.value}</p>
                   <p className={`text-sm font-medium ${stat.trendColor} flex items-center`}>
                     <TrendingUp className="h-4 w-4 mr-1" />
                     {stat.trend} from last week
                   </p>
                 </div>
-                <div className={`${stat.bgColor} p-4 rounded-2xl`}>
-                  <Icon className={`h-8 w-8 ${stat.iconColor}`} />
+                <div className={`${stat.bgColor} p-3 lg:p-4 rounded-2xl`}>
+                  <Icon className={`h-6 w-6 lg:h-8 lg:w-8 ${stat.iconColor}`} />
                 </div>
               </div>
             </motion.div>
@@ -189,11 +255,12 @@ export const Dashboard: React.FC = () => {
         })}
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {user?.role === 'teacher' && (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Weekly Attendance Trend */}
         <motion.div 
           variants={itemVariants}
-          className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
+          className="bg-white rounded-2xl p-4 lg:p-6 shadow-lg border border-gray-100"
         >
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -204,7 +271,7 @@ export const Dashboard: React.FC = () => {
               <TrendingUp className="h-5 w-5 text-green-600" />
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={250}>
             <AreaChart data={weeklyData}>
               <defs>
                 <linearGradient id="colorAttendance" x1="0" y1="0" x2="0" y2="1">
@@ -245,7 +312,7 @@ export const Dashboard: React.FC = () => {
         {/* Subject-wise Performance */}
         <motion.div 
           variants={itemVariants}
-          className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
+          className="bg-white rounded-2xl p-4 lg:p-6 shadow-lg border border-gray-100"
         >
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -256,7 +323,7 @@ export const Dashboard: React.FC = () => {
               <BookOpen className="h-5 w-5 text-blue-600" />
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={subjectData} layout="horizontal">
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis type="number" stroke="#6b7280" />
@@ -278,12 +345,82 @@ export const Dashboard: React.FC = () => {
           </ResponsiveContainer>
         </motion.div>
       </div>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {user?.role === 'student' && (
+        <div className="space-y-6">
+          {/* Student Profile Section */}
+          <motion.div 
+            variants={itemVariants}
+            className="bg-white rounded-2xl p-4 lg:p-6 shadow-lg border border-gray-100"
+          >
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">My Profile</h3>
+            <div className="flex flex-col lg:flex-row items-start lg:items-center space-y-4 lg:space-y-0 lg:space-x-6">
+              <img
+                src={user?.avatar || 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'}
+                alt={user?.name}
+                className="w-24 h-24 lg:w-32 lg:h-32 rounded-full object-cover border-4 border-blue-100"
+              />
+              <div className="flex-1">
+                <h4 className="text-2xl font-bold text-gray-900 mb-2">{user?.name}</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-600">Student ID:</span>
+                    <span className="ml-2 font-medium">{user?.student_id}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Semester:</span>
+                    <span className="ml-2 font-medium">{user?.semester}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Department:</span>
+                    <span className="ml-2 font-medium">Computer Science</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Year:</span>
+                    <span className="ml-2 font-medium">{user?.year}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* My Attendance Progress */}
+          <motion.div 
+            variants={itemVariants}
+            className="bg-white rounded-2xl p-4 lg:p-6 shadow-lg border border-gray-100"
+          >
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">My Attendance Progress</h3>
+            <div className="space-y-4">
+              {subjectData.map((subject, index) => (
+                <div key={index} className="p-4 bg-gray-50 rounded-xl">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium text-gray-900">{subject.subject}</span>
+                    <span className="text-sm font-bold text-blue-600">{subject.attendance}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        subject.attendance >= 85 ? 'bg-green-500' :
+                        subject.attendance >= 75 ? 'bg-blue-500' :
+                        subject.attendance >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                      }`}
+                      style={{ width: `${subject.attendance}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {user?.role === 'teacher' && (
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Attendance Distribution */}
         <motion.div 
           variants={itemVariants}
-          className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
+          className="bg-white rounded-2xl p-4 lg:p-6 shadow-lg border border-gray-100"
         >
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -331,7 +468,7 @@ export const Dashboard: React.FC = () => {
         {/* Recent Defaulters */}
         <motion.div 
           variants={itemVariants}
-          className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
+          className="xl:col-span-2 bg-white rounded-2xl p-4 lg:p-6 shadow-lg border border-gray-100"
         >
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -352,22 +489,22 @@ export const Dashboard: React.FC = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-xl border border-red-100"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-xl border border-red-100 space-y-3 sm:space-y-0"
                 >
                   <div className="flex items-center space-x-4">
                     <img
                       src={student.avatar}
                       alt={student.name}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md"
+                      className="w-10 h-10 lg:w-12 lg:h-12 rounded-full object-cover border-2 border-white shadow-md"
                     />
                     <div>
                       <p className="font-semibold text-gray-900">{student.name}</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs lg:text-sm text-gray-600">
                         {student.student_id} • Semester {student.semester} - Section {student.section}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right sm:text-right">
                     <p className="text-2xl font-bold text-red-600">{student.attendance_percentage}%</p>
                     <p className="text-xs text-red-500 font-medium">Below threshold</p>
                   </div>
@@ -376,40 +513,7 @@ export const Dashboard: React.FC = () => {
           </div>
         </motion.div>
       </div>
-
-      {/* Quick Actions */}
-      <motion.div 
-        variants={itemVariants}
-        className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
-      >
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex items-center justify-center p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl"
-          >
-            <Calendar className="h-5 w-5 mr-2" />
-            <span className="font-medium">Mark Attendance</span>
-          </motion.button>
-          <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex items-center justify-center p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all shadow-lg hover:shadow-xl"
-          >
-            <TrendingUp className="h-5 w-5 mr-2" />
-            <span className="font-medium">Generate Report</span>
-          </motion.button>
-          <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex items-center justify-center p-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
-          >
-            <AlertTriangle className="h-5 w-5 mr-2" />
-            <span className="font-medium">Send Alerts</span>
-          </motion.button>
-        </div>
-      </motion.div>
+      )}
     </motion.div>
   );
 };

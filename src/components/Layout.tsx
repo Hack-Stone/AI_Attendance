@@ -77,17 +77,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           initial={{ x: -300 }}
           animate={{ x: sidebarOpen ? 0 : -300 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className={`fixed inset-y-0 left-0 z-50 w-72 bg-white/95 backdrop-blur-xl shadow-2xl border-r border-gray-200/50 ${
+          className={`fixed inset-y-0 left-0 z-50 w-64 lg:w-72 bg-white/95 backdrop-blur-xl shadow-2xl border-r border-gray-200/50 ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           } lg:translate-x-0 lg:static lg:inset-0`}
         >
-          <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
+          <div className="flex items-center justify-between p-4 lg:p-6 border-b border-gray-200/50">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl">
                 <Monitor className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                <h1 className="text-lg lg:text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   CS Department
                 </h1>
                 <p className="text-xs text-gray-500">Attendance System</p>
@@ -101,7 +101,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </button>
           </div>
 
-          <nav className="mt-8 px-4 space-y-2">
+          <nav className="mt-6 lg:mt-8 px-3 lg:px-4 space-y-1 lg:space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -110,7 +110,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center px-4 py-3 rounded-xl transition-all duration-200 group ${
+                  className={`flex items-center px-3 lg:px-4 py-2 lg:py-3 rounded-xl transition-all duration-200 group ${
                     isActive
                       ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25'
                       : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
@@ -118,7 +118,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   onClick={() => setSidebarOpen(false)}
                 >
                   <Icon className={`h-5 w-5 mr-3 ${isActive ? 'text-white' : item.color}`} />
-                  <span className="font-medium">{item.label}</span>
+                  <span className="font-medium text-sm lg:text-base">{item.label}</span>
                   {isActive && (
                     <motion.div
                       layoutId="activeTab"
@@ -136,10 +136,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <img
                 src={user?.avatar || 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&fit=crop'}
                 alt={user?.name}
-                className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md"
+                className="w-8 h-8 lg:w-10 lg:h-10 rounded-full object-cover border-2 border-white shadow-md"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">{user?.name}</p>
+                <p className="text-xs lg:text-sm font-semibold text-gray-900 truncate">{user?.name}</p>
                 <p className="text-xs text-gray-500 capitalize">
                   {user?.role} • {user?.employee_id || user?.student_id}
                 </p>
@@ -157,10 +157,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </AnimatePresence>
 
       {/* Main Content */}
-      <div className="lg:ml-72">
+      <div className="lg:ml-64 xl:ml-72">
         {/* Header */}
         <header className="bg-white/80 backdrop-blur-xl shadow-sm border-b border-gray-200/50 sticky top-0 z-40">
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center justify-between px-4 lg:px-6 py-3 lg:py-4">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setSidebarOpen(true)}
@@ -170,10 +170,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               </button>
               
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-base lg:text-lg font-semibold text-gray-900">
                   Computer Science Department
                 </h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs lg:text-sm text-gray-500 hidden sm:block">
                   Smart Attendance Management System
                 </p>
               </div>
@@ -184,7 +184,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setChatOpen(true)}
-                className="relative p-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                className="relative p-2 lg:p-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 <MessageCircle className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full animate-pulse"></span>
@@ -194,7 +194,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
+        <main className="p-4 lg:p-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
