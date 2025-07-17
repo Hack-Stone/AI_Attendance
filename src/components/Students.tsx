@@ -18,22 +18,41 @@ import {
   BookOpen,
   AlertTriangle
 } from 'lucide-react';
-import { mockStudents } from '../utils/mockData';
+import { mockStudents, mockTeachers } from '../utils/mockData';
 import { Student } from '../types';
+import { 
+  getStudents, 
+  createStudent, 
+  updateStudent, 
+  deleteStudent 
+} from '../utils/database';
 import toast from 'react-hot-toast';
 
 export const Students: React.FC = () => {
+  const [students, setStudents] = useState<Student[]>(mockStudents);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSemester, setSelectedSemester] = useState('all');
   const [selectedSection, setSelectedSection] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [newStudent, setNewStudent] = useState({
+    name: '',
+    email: '',
+    student_id: '',
+    semester: 2,
+    year: 2024,
+    section: 'A',
+    parent_email: '',
+    parent_phone: ''
+  });
 
   const semesters = ['all', '2', '4', '6', '8'];
   const sections = ['all', 'A', 'B'];
 
-  const filteredStudents = mockStudents
+  const filteredStudents = students
     .filter(student => {
       const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            student.student_id.toLowerCase().includes(searchTerm.toLowerCase());
@@ -62,25 +81,131 @@ export const Students: React.FC = () => {
     return 'text-red-600 bg-red-50 border-red-200';
   };
 
+  const handleAddStudent = async () => {
+    setLoading(true);
+    try {
+      const studentData = {
+        ...newStudent,
+        avatar: `https://images.pexels.com/photos/${Math.floor(Math.random() * 1000000)}/pexels-photo-${Math.floor(Math.random() * 1000000)}.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop`,
+        total_classes: 0,
+        attended_classes: 0,
+        attendance_percentage: 0
+      };
+      
+      // In a real app, this would call the API
+      const newStudentRecord = { ...studentData, id: Date.now().toString() };
+      setStudents(prev => [...prev, newStudentRecord]);
+      
+      setShowAddModal(false);
+      setNewStudent({
+        name: '',
+        email: '',
+        student_id: '',
+        semester: 2,
+        year: 2024,
+        section: 'A',
+        parent_email: '',
+        parent_phone: ''
+      });
+      toast.success('Student added successfully!');
+    } catch (error) {
+      toast.error('Failed to add student');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditStudent = async () => {
+    if (!selectedStudent) return;
+    
+    setLoading(true);
+    try {
+      setStudents(prev => 
+        prev.map(s => s.id === selectedStudent.id ? selectedStudent : s)
+      );
+      
+      setShowEditModal(false);
+      setSelectedStudent(null);
+      toast.success('Student updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update student');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteStudent = async (student: Student) => {
+    if (!confirm(`Are you sure you want to delete ${student.name}?`)) return;
+    
+    setLoading(true);
+    try {
+      setStudents(prev => prev.filter(s => s.id !== student.id));
+      toast.success(`${student.name} deleted successfully`);
+    } catch (error) {
+      toast.error('Failed to delete student');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImportStudents = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv,.xlsx,.xls';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // Simulate import
+        toast.success(`Importing ${file.name}...`);
+        setTimeout(() => {
+          toast.success('Students imported successfully!');
+        }, 2000);
+      }
+    };
+    input.click();
+  };
+
+  const handleExportStudents = () => {
+    const csvContent = [
+      ['Name', 'Student ID', 'Email', 'Semester', 'Section', 'Attendance %', 'Parent Email', 'Parent Phone'],
+      ...filteredStudents.map(s => [
+        s.name, s.student_id, s.email, s.semester, s.section, 
+        s.attendance_percentage, s.parent_email, s.parent_phone
+      ])
+    ].map(row => row.join(',')).join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'students_export.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Students exported successfully!');
+  };
+
   const handleAction = (action: string, student?: Student) => {
     switch (action) {
       case 'add':
         setShowAddModal(true);
         break;
       case 'edit':
-        setSelectedStudent(student || null);
+        if (student) {
+          setSelectedStudent(student);
+          setShowEditModal(true);
+        }
         break;
       case 'delete':
-        toast.success(`Student ${student?.name} deleted successfully`);
+        if (student) handleDeleteStudent(student);
         break;
       case 'email':
         toast.success(`Email sent to ${student?.parent_email}`);
         break;
       case 'export':
-        toast.success('Student data exported successfully');
+        handleExportStudents();
         break;
       case 'import':
-        toast.success('Student data imported successfully');
+        handleImportStudents();
         break;
       default:
         break;
@@ -126,28 +251,31 @@ export const Students: React.FC = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => handleAction('import')}
+            disabled={loading}
             className="flex items-center px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-all shadow-sm"
           >
             <Upload className="h-4 w-4 mr-2" />
-            Import
+            {loading ? 'Importing...' : 'Import'}
           </motion.button>
           <motion.button 
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => handleAction('export')}
+            disabled={loading}
             className="flex items-center px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-all shadow-sm"
           >
             <Download className="h-4 w-4 mr-2" />
-            Export
+            {loading ? 'Exporting...' : 'Export'}
           </motion.button>
           <motion.button 
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => handleAction('add')}
+            disabled={loading}
             className="flex items-center px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
           >
             <UserPlus className="h-4 w-4 mr-2" />
-            Add Student
+            {loading ? 'Adding...' : 'Add Student'}
           </motion.button>
         </div>
       </motion.div>
@@ -363,6 +491,210 @@ export const Students: React.FC = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Add Student Modal */}
+      <AnimatePresence>
+        {showAddModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+            >
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Add New Student</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                  <input
+                    type="text"
+                    value={newStudent.name}
+                    onChange={(e) => setNewStudent(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter student name"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
+                  <input
+                    type="text"
+                    value={newStudent.student_id}
+                    onChange={(e) => setNewStudent(prev => ({ ...prev, student_id: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter student ID"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={newStudent.email}
+                    onChange={(e) => setNewStudent(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter email address"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Semester</label>
+                    <select
+                      value={newStudent.semester}
+                      onChange={(e) => setNewStudent(prev => ({ ...prev, semester: Number(e.target.value) }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value={2}>Semester 2</option>
+                      <option value={4}>Semester 4</option>
+                      <option value={6}>Semester 6</option>
+                      <option value={8}>Semester 8</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Section</label>
+                    <select
+                      value={newStudent.section}
+                      onChange={(e) => setNewStudent(prev => ({ ...prev, section: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="A">Section A</option>
+                      <option value="B">Section B</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Parent Email</label>
+                  <input
+                    type="email"
+                    value={newStudent.parent_email}
+                    onChange={(e) => setNewStudent(prev => ({ ...prev, parent_email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter parent email"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Parent Phone</label>
+                  <input
+                    type="tel"
+                    value={newStudent.parent_phone}
+                    onChange={(e) => setNewStudent(prev => ({ ...prev, parent_phone: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter parent phone"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex space-x-3 mt-6">
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddStudent}
+                  disabled={loading || !newStudent.name || !newStudent.student_id}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? 'Adding...' : 'Add Student'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Student Modal */}
+      <AnimatePresence>
+        {showEditModal && selectedStudent && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+            >
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Edit Student</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                  <input
+                    type="text"
+                    value={selectedStudent.name}
+                    onChange={(e) => setSelectedStudent(prev => prev ? { ...prev, name: e.target.value } : null)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={selectedStudent.email}
+                    onChange={(e) => setSelectedStudent(prev => prev ? { ...prev, email: e.target.value } : null)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Parent Email</label>
+                  <input
+                    type="email"
+                    value={selectedStudent.parent_email}
+                    onChange={(e) => setSelectedStudent(prev => prev ? { ...prev, parent_email: e.target.value } : null)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Parent Phone</label>
+                  <input
+                    type="tel"
+                    value={selectedStudent.parent_phone}
+                    onChange={(e) => setSelectedStudent(prev => prev ? { ...prev, parent_phone: e.target.value } : null)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex space-x-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setSelectedStudent(null);
+                  }}
+                  className="flex-1 px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEditStudent}
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? 'Updating...' : 'Update Student'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

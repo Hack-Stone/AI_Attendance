@@ -7,6 +7,7 @@ import { Students } from './components/Students';
 import { Subjects } from './components/Subjects';
 import { Attendance } from './components/Attendance';
 import { Defaulters } from './components/Defaulters';
+import { FacultyManagement } from './components/FacultyManagement';
 import { getCurrentUser } from './utils/auth';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -33,7 +34,7 @@ function App() {
                   <Route path="/defaulters" element={<Defaulters />} />
                   <Route path="/my-attendance" element={<Dashboard />} />
                   <Route path="/my-subjects" element={<Subjects />} />
-                  <Route path="/teachers" element={<div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">Faculty Management</h2><p className="text-gray-600 mt-2">Manage Computer Science Department faculty members</p></div>} />
+                  <Route path="/teachers" element={<FacultyManagement />} />
                   <Route path="/reports" element={<div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">Reports & Analytics</h2><p className="text-gray-600 mt-2">Generate comprehensive attendance reports</p></div>} />
                   <Route path="/notifications" element={<div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">Notification Center</h2><p className="text-gray-600 mt-2">Manage parent notifications and alerts</p></div>} />
                   <Route path="/settings" element={<div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">System Settings</h2><p className="text-gray-600 mt-2">Configure department settings and preferences</p></div>} />

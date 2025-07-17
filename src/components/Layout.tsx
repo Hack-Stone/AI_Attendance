@@ -101,7 +101,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </button>
           </div>
 
-          <nav className="mt-6 lg:mt-8 px-3 lg:px-4 space-y-1 lg:space-y-2">
+          <nav className="mt-6 lg:mt-8 px-3 lg:px-4 space-y-1 lg:space-y-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
