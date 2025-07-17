@@ -15,7 +15,8 @@ import {
   UserPlus,
   Users,
   GraduationCap,
-  BookOpen
+  BookOpen,
+  AlertTriangle
 } from 'lucide-react';
 import { mockStudents } from '../utils/mockData';
 import { Student } from '../types';
