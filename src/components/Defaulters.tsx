@@ -22,11 +22,11 @@ export const Defaulters: React.FC = () => {
 
   const defaulters = mockStudents.filter(student => {
     const meetsCriteria = student.attendancePercentage < threshold;
-    const matchesClass = selectedClass === 'all' || student.class === selectedClass;
+    const matchesSemester = selectedClass === 'all' || student.semester.toString() === selectedClass;
     const matchesSection = selectedSection === 'all' || student.section === selectedSection;
     
-    return meetsCriteria && matchesClass && matchesSection;
-  }).sort((a, b) => a.attendancePercentage - b.attendancePercentage);
+    return meetsCriteria && matchesSemester && matchesSection;
+  }).sort((a, b) => a.attendance_percentage - b.attendance_percentage);
 
   const getSeverityLevel = (percentage: number) => {
     if (percentage < 50) return { level: 'Critical', color: 'text-red-700 bg-red-100 border-red-200' };
@@ -94,7 +94,7 @@ export const Defaulters: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">Critical (&lt;50%)</p>
               <p className="text-2xl font-bold text-red-700">
-                {defaulters.filter(s => s.attendancePercentage < 50).length}
+                {defaulters.filter(s => s.attendance_percentage < 50).length}
               </p>
             </div>
             <TrendingDown className="h-8 w-8 text-red-700" />
@@ -106,7 +106,7 @@ export const Defaulters: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">High Risk (50-65%)</p>
               <p className="text-2xl font-bold text-orange-600">
-                {defaulters.filter(s => s.attendancePercentage >= 50 && s.attendancePercentage < 65).length}
+                {defaulters.filter(s => s.attendance_percentage >= 50 && s.attendance_percentage < 65).length}
               </p>
             </div>
             <AlertTriangle className="h-8 w-8 text-orange-500" />
@@ -118,7 +118,7 @@ export const Defaulters: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">Medium Risk (65-75%)</p>
               <p className="text-2xl font-bold text-amber-600">
-                {defaulters.filter(s => s.attendancePercentage >= 65 && s.attendancePercentage < 75).length}
+                {defaulters.filter(s => s.attendance_percentage >= 65 && s.attendance_percentage < 75).length}
               </p>
             </div>
             <Calendar className="h-8 w-8 text-amber-500" />
@@ -147,15 +147,15 @@ export const Defaulters: React.FC = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Class</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Semester</label>
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              {classes.map(cls => (
-                <option key={cls} value={cls}>
-                  {cls === 'all' ? 'All Classes' : `Class ${cls}`}
+              {['all', '2', '4', '6', '8'].map(sem => (
+                <option key={sem} value={sem}>
+                  {sem === 'all' ? 'All Semesters' : `Semester ${sem}`}
                 </option>
               ))}
             </select>
@@ -200,7 +200,7 @@ export const Defaulters: React.FC = () => {
         ) : (
           <div className="divide-y divide-gray-200">
             {defaulters.map((student) => {
-              const severity = getSeverityLevel(student.attendancePercentage);
+              const severity = getSeverityLevel(student.attendance_percentage);
               
               return (
                 <div key={student.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
@@ -214,14 +214,14 @@ export const Defaulters: React.FC = () => {
                       <div>
                         <h4 className="font-medium text-gray-900">{student.name}</h4>
                         <p className="text-sm text-gray-600">
-                          {student.rollNumber} • {student.class} - {student.section}
+                          {student.student_id} • Semester {student.semester} - Section {student.section}
                         </p>
                         <div className="flex items-center space-x-4 mt-1">
                           <span className="text-xs text-gray-500">
-                            📧 {student.parentEmail}
+                            📧 {student.parent_email}
                           </span>
                           <span className="text-xs text-gray-500">
-                            📱 {student.parentPhone}
+                            📱 {student.parent_phone}
                           </span>
                         </div>
                       </div>
@@ -233,10 +233,10 @@ export const Defaulters: React.FC = () => {
                           {severity.level}
                         </div>
                         <p className="text-2xl font-bold text-red-600 mt-1">
-                          {student.attendancePercentage}%
+                          {student.attendance_percentage}%
                         </p>
                         <p className="text-xs text-gray-500">
-                          {student.attendedClasses}/{student.totalClasses} classes
+                          {student.attended_classes}/{student.total_classes} classes
                         </p>
                       </div>
                       
