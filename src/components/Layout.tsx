@@ -102,6 +102,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
 
           <nav className="mt-6 lg:mt-8 px-3 lg:px-4 space-y-1 lg:space-y-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <div className="max-h-[calc(100vh-250px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pr-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -128,10 +129,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </Link>
               );
             })}
+          </div>
           </nav>
 
           {/* User Profile */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-gradient-to-r from-gray-50 to-blue-50">
+          <div className="mt-auto p-4 border-t bg-gradient-to-r from-gray-50 to-blue-50">
             <div className="flex items-center space-x-3 mb-3">
               <img
                 src={user?.avatar || 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&fit=crop'}
