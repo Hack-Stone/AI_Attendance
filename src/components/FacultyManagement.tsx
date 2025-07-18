@@ -13,10 +13,12 @@ import {
   GraduationCap,
   BookOpen,
   Users,
-  Award
+  Award,
+  Eye
 } from 'lucide-react';
 import { mockTeachers } from '../utils/mockData';
 import { Teacher } from '../types';
+import { ProfileModal } from './ProfileModal';
 import toast from 'react-hot-toast';
 
 export const FacultyManagement: React.FC = () => {
@@ -26,6 +28,8 @@ export const FacultyManagement: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileTeacher, setProfileTeacher] = useState<Teacher | null>(null);
   const [newTeacher, setNewTeacher] = useState({
     name: '',
     email: '',
@@ -100,6 +104,11 @@ export const FacultyManagement: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewProfile = (teacher: Teacher) => {
+    setProfileTeacher(teacher);
+    setShowProfileModal(true);
   };
 
   const handleImportTeachers = () => {
@@ -241,10 +250,16 @@ export const FacultyManagement: React.FC = () => {
                   <img
                     src={teacher.avatar}
                     alt={teacher.name}
-                    className="w-14 h-14 rounded-full object-cover border-2 border-gray-200"
+                    onClick={() => handleViewProfile(teacher)}
+                    className="w-14 h-14 rounded-full object-cover border-2 border-gray-200 cursor-pointer"
                   />
                   <div>
-                    <h3 className="font-semibold text-gray-900 text-lg">{teacher.name}</h3>
+                    <h3 
+                      className="font-semibold text-gray-900 text-lg cursor-pointer hover:text-purple-600 transition-colors"
+                      onClick={() => handleViewProfile(teacher)}
+                    >
+                      {teacher.name}
+                    </h3>
                     <p className="text-sm text-gray-600">{teacher.employee_id}</p>
                   </div>
                 </div>
@@ -291,6 +306,15 @@ export const FacultyManagement: React.FC = () => {
               </div>
 
               <div className="flex items-center space-x-2 mt-6 pt-4 border-t border-gray-100">
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleViewProfile(teacher)}
+                  className="flex items-center px-3 py-2 text-xs text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-all"
+                >
+                  <Eye className="h-3 w-3 mr-1" />
+                  View
+                </motion.button>
                 <motion.button 
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -480,6 +504,17 @@ export const FacultyManagement: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Profile Modal */}
+      <ProfileModal
+        isOpen={showProfileModal}
+        onClose={() => {
+          setShowProfileModal(false);
+          setProfileTeacher(null);
+        }}
+        person={profileTeacher}
+        type="teacher"
+      />
 
       {/* Summary Stats */}
       <motion.div 

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { mockStudents, mockTeachers } from '../utils/mockData';
 import { Student } from '../types';
+import { ProfileModal } from './ProfileModal';
 import { 
   getStudents, 
   createStudent, 
@@ -38,6 +39,8 @@ export const Students: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileStudent, setProfileStudent] = useState<Student | null>(null);
   const [newStudent, setNewStudent] = useState({
     name: '',
     email: '',
@@ -184,6 +187,11 @@ export const Students: React.FC = () => {
     toast.success('Students exported successfully!');
   };
 
+  const handleViewProfile = (student: Student) => {
+    setProfileStudent(student);
+    setShowProfileModal(true);
+  };
+
   const handleAction = (action: string, student?: Student) => {
     switch (action) {
       case 'add':
@@ -197,6 +205,9 @@ export const Students: React.FC = () => {
         break;
       case 'delete':
         if (student) handleDeleteStudent(student);
+        break;
+      case 'view':
+        if (student) handleViewProfile(student);
         break;
       case 'email':
         toast.success(`Email sent to ${student?.parent_email}`);
@@ -406,6 +417,7 @@ export const Students: React.FC = () => {
                 <motion.button 
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => handleAction('view', student)}
                   className="flex items-center px-3 py-2 text-xs text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-all"
                 >
                   <Eye className="h-3 w-3 mr-1" />
@@ -695,6 +707,17 @@ export const Students: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Profile Modal */}
+      <ProfileModal
+        isOpen={showProfileModal}
+        onClose={() => {
+          setShowProfileModal(false);
+          setProfileStudent(null);
+        }}
+        person={profileStudent}
+        type="student"
+      />
     </motion.div>
   );
 };
