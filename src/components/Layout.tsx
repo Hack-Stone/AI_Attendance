@@ -60,7 +60,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       return [
         ...baseItems,
         { path: '/my-attendance', icon: Calendar, label: 'My Attendance', color: 'text-blue-600' },
+        { path: '/leave-application', icon: FileText, label: 'Leave Application', color: 'text-purple-600' },
         { path: '/my-subjects', icon: BookOpen, label: 'My Subjects', color: 'text-green-600' },
+        { path: '/notifications', icon: Bell, label: 'Notifications', color: 'text-pink-600' },
       ];
     }
   };

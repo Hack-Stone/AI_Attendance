@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Users, 
@@ -13,7 +14,9 @@ import {
   GraduationCap,
   Award,
   Activity,
-  XCircle
+  XCircle,
+  FileText,
+  Bell
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { mockStudents } from '../utils/mockData';
@@ -21,6 +24,7 @@ import { getCurrentUser } from '../utils/auth';
 
 export const Dashboard: React.FC = () => {
   const user = getCurrentUser();
+  const navigate = useNavigate();
   const [timeOfDay, setTimeOfDay] = useState('');
 
   useEffect(() => {
@@ -349,6 +353,66 @@ export const Dashboard: React.FC = () => {
 
       {user?.role === 'student' && (
         <div className="space-y-6">
+          {/* Quick Actions for Students */}
+          <motion.div 
+            variants={itemVariants}
+            className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
+          >
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate('/leave-application')}
+                className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-100 transition-all cursor-pointer"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-blue-600 rounded-lg">
+                    <FileText className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-blue-900">Apply for Leave</h4>
+                    <p className="text-sm text-blue-700">Submit leave requests</p>
+                  </div>
+                </div>
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate('/my-attendance')}
+                className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-100 transition-all cursor-pointer"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-green-600 rounded-lg">
+                    <Calendar className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-green-900">View Attendance</h4>
+                    <p className="text-sm text-green-700">Check your records</p>
+                  </div>
+                </div>
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate('/notifications')}
+                className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl hover:from-purple-100 hover:to-pink-100 transition-all cursor-pointer"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-purple-600 rounded-lg">
+                    <Bell className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-purple-900">Notifications</h4>
+                    <p className="text-sm text-purple-700">View alerts & updates</p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+
           {/* Student Profile Section */}
           <motion.div 
             variants={itemVariants}
@@ -383,6 +447,29 @@ export const Dashboard: React.FC = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Attendance Alert for Students */}
+            {stats.attendancePercentage < 75 && (
+              <div className="mt-6 p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl">
+                <div className="flex items-start space-x-3">
+                  <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-red-900 mb-1">Low Attendance Alert</h4>
+                    <p className="text-sm text-red-700 mb-2">
+                      Your attendance is below the required 75% threshold. Please attend classes regularly to avoid academic issues.
+                    </p>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => navigate('/leave-application')}
+                      className="text-xs bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      Apply for Leave if Needed
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            )}
           </motion.div>
 
           {/* My Attendance Progress */}
