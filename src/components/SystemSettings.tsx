@@ -15,7 +15,8 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  Globe
+  Globe,
+  Activity
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
