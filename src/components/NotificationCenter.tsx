@@ -1,20 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Bell, 
-  Check, 
-  X, 
-  AlertTriangle, 
-  Info, 
-  CheckCircle,
-  Clock,
-  User,
-  Calendar,
-  Filter,
-  MarkAsUnread,
-  Trash2,
-  Settings
-} from 'lucide-react';
+import { Bell, Check, X, AlertTriangle, Info, CheckCircle, Clock, User, Calendar, Filter, AreaChart as MarkAsUnread, Trash2, Settings } from 'lucide-react';
 import { getCurrentUser } from '../utils/auth';
 import { mockStudents } from '../utils/mockData';
 import toast from 'react-hot-toast';
