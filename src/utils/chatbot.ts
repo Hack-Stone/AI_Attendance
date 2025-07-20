@@ -348,3 +348,6 @@ export const processStudentMessage = (message: string): ChatMessage => {
     }
   }
 }
+    }
+  }
+}
