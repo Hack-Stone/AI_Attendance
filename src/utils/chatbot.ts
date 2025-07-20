@@ -49,6 +49,7 @@ export const processMessage = (message: string): ChatMessage => {
     return processStudentMessage(message);
   }
 };
+
 const studentResponses = {
   greeting: [
     "Hello! I'm your personal AI Study Companion, designed specifically for Computer Science students. I can help you excel academically, track your progress, and provide personalized guidance for your CS journey!",
@@ -86,6 +87,7 @@ const studentResponses = {
     "Based on your achievements, here's encouragement and next steps:"
   ]
 };
+
 export const processTeacherMessage = (message: string): ChatMessage => {
   const lowerMessage = message.toLowerCase();
   
@@ -158,7 +160,7 @@ export const processTeacherMessage = (message: string): ChatMessage => {
   if (lowerMessage.includes('report') || lowerMessage.includes('generate') || lowerMessage.includes('analytics')) {
     return {
       id: Date.now().toString(),
-      message: `${teacherResponses.reports[Math.floor(Math.random() * teacherResponses.reports.length)]}\n\n📋 Available Report Types:\n\n🎯 Standard Reports:\n• Daily/Weekly/Monthly attendance summaries\n• Student performance analytics\n• Subject-wise attendance breakdown\n• Semester comparison analysis\n• Parent notification lists\n\n🔬 Advanced Analytics:\n• Predictive risk assessment reports\n• Behavioral pattern analysis\n• Intervention effectiveness tracking\n• Correlation analysis (attendance vs grades)\n• Early warning system alerts\n\n📊 Visual Dashboards:\n• Interactive attendance heatmaps\n• Trend analysis charts\n• Performance comparison graphs\n• Real-time monitoring displays\n\n🚀 AI-Powered Insights:\n• Personalized student recommendations\n• Optimal intervention timing\n• Resource allocation suggestions\n• Success probability predictions\n\nWhich type of intelligent report would you like me to generate?",
+      message: `${teacherResponses.reports[Math.floor(Math.random() * teacherResponses.reports.length)]}\n\n📋 Available Report Types:\n\n🎯 Standard Reports:\n• Daily/Weekly/Monthly attendance summaries\n• Student performance analytics\n• Subject-wise attendance breakdown\n• Semester comparison analysis\n• Parent notification lists\n\n🔬 Advanced Analytics:\n• Predictive risk assessment reports\n• Behavioral pattern analysis\n• Intervention effectiveness tracking\n• Correlation analysis (attendance vs grades)\n• Early warning system alerts\n\n📊 Visual Dashboards:\n• Interactive attendance heatmaps\n• Trend analysis charts\n• Performance comparison graphs\n• Real-time monitoring displays\n\n🚀 AI-Powered Insights:\n• Personalized student recommendations\n• Optimal intervention timing\n• Resource allocation suggestions\n• Success probability predictions\n\nWhich type of intelligent report would you like me to generate?`,
       sender: 'bot',
       timestamp: new Date().toISOString(),
       type: 'text'
@@ -218,6 +220,7 @@ export const processTeacherMessage = (message: string): ChatMessage => {
     type: 'text'
   };
 };
+
 export const processStudentMessage = (message: string): ChatMessage => {
   const lowerMessage = message.toLowerCase();
   const user = getCurrentUser();
@@ -298,7 +301,7 @@ export const processStudentMessage = (message: string): ChatMessage => {
   if (lowerMessage.includes('career') || lowerMessage.includes('job') || lowerMessage.includes('future') || lowerMessage.includes('specialization')) {
     return {
       id: Date.now().toString(),
-      message: `${studentResponses.career[Math.floor(Math.random() * studentResponses.career.length)]}\n\n🚀 CS Career Pathways Based on Your Profile:\n\n💻 Software Development:\n• Full-Stack Developer (High demand, great for versatile learners)\n• Mobile App Developer (iOS/Android)\n• DevOps Engineer (Operations + Development)\n• Game Developer (Creative + Technical)\n\n🔬 Specialized Fields:\n• Data Scientist/ML Engineer (Math + Programming)\n• Cybersecurity Specialist (Security + Networks)\n• Cloud Architect (Scalable systems design)\n• AI/ML Research (Advanced algorithms)\n\n🏢 Industry Opportunities:\n• Tech Giants (Google, Microsoft, Amazon, Apple)\n• Startups (High growth potential, diverse roles)\n• Finance (FinTech, algorithmic trading)\n• Healthcare (Health tech, medical software)\n\n📈 Emerging Fields:\n• Blockchain Development\n• IoT (Internet of Things)\n• AR/VR Development\n• Quantum Computing\n\n🎯 Skill Development Roadmap:\n• Master fundamental programming languages\n• Learn system design and architecture\n• Develop problem-solving abilities\n• Build communication and teamwork skills\n• Stay updated with industry trends\n\n💰 Salary Expectations (Entry Level):\n• Software Developer: ₹4-8 LPA\n• Data Scientist: ₹6-12 LPA\n• ML Engineer: ₹8-15 LPA\n• Product Manager: ₹10-18 LPA\n\nWould you like specific guidance for any particular career path?",
+      message: `${studentResponses.career[Math.floor(Math.random() * studentResponses.career.length)]}\n\n🚀 CS Career Pathways Based on Your Profile:\n\n💻 Software Development:\n• Full-Stack Developer (High demand, great for versatile learners)\n• Mobile App Developer (iOS/Android)\n• DevOps Engineer (Operations + Development)\n• Game Developer (Creative + Technical)\n\n🔬 Specialized Fields:\n• Data Scientist/ML Engineer (Math + Programming)\n• Cybersecurity Specialist (Security + Networks)\n• Cloud Architect (Scalable systems design)\n• AI/ML Research (Advanced algorithms)\n\n🏢 Industry Opportunities:\n• Tech Giants (Google, Microsoft, Amazon, Apple)\n• Startups (High growth potential, diverse roles)\n• Finance (FinTech, algorithmic trading)\n• Healthcare (Health tech, medical software)\n\n📈 Emerging Fields:\n• Blockchain Development\n• IoT (Internet of Things)\n• AR/VR Development\n• Quantum Computing\n\n🎯 Skill Development Roadmap:\n• Master fundamental programming languages\n• Learn system design and architecture\n• Develop problem-solving abilities\n• Build communication and teamwork skills\n• Stay updated with industry trends\n\n💰 Salary Expectations (Entry Level):\n• Software Developer: ₹4-8 LPA\n• Data Scientist: ₹6-12 LPA\n• ML Engineer: ₹8-15 LPA\n• Product Manager: ₹10-18 LPA\n\nWould you like specific guidance for any particular career path?`,
       sender: 'bot',
       timestamp: new Date().toISOString(),
       type: 'text'
@@ -316,7 +319,7 @@ export const processStudentMessage = (message: string): ChatMessage => {
     
     return {
       id: Date.now().toString(),
-      message: `${studentResponses.motivation[Math.floor(Math.random() * studentResponses.motivation.length)]}\n\n${motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]}\n\n🏆 Your Achievements So Far:\n• Successfully enrolled in a competitive CS program\n• Building valuable technical skills daily\n• Part of the next generation of tech innovators\n• Developing logical thinking and problem-solving abilities\n\n💡 Remember:\n• Every successful programmer faced the same challenges\n• Consistency beats perfection every time\n• Your unique perspective adds value to the tech world\n• Small daily improvements lead to remarkable results\n\n🎯 Quick Confidence Boosters:\n• Review your completed projects and assignments\n• Connect with classmates facing similar challenges\n• Celebrate small wins and learning milestones\n• Visualize your future success in tech\n\n🤝 Support Resources:\n• Faculty office hours for academic help\n• Peer study groups for collaborative learning\n• Online communities for motivation and tips\n• Career counseling for future planning\n\nYou've got this! Every challenge is making you a better programmer! 💻✨",
+      message: `${studentResponses.motivation[Math.floor(Math.random() * studentResponses.motivation.length)]}\n\n${motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]}\n\n🏆 Your Achievements So Far:\n• Successfully enrolled in a competitive CS program\n• Building valuable technical skills daily\n• Part of the next generation of tech innovators\n• Developing logical thinking and problem-solving abilities\n\n💡 Remember:\n• Every successful programmer faced the same challenges\n• Consistency beats perfection every time\n• Your unique perspective adds value to the tech world\n• Small daily improvements lead to remarkable results\n\n🎯 Quick Confidence Boosters:\n• Review your completed projects and assignments\n• Connect with classmates facing similar challenges\n• Celebrate small wins and learning milestones\n• Visualize your future success in tech\n\n🤝 Support Resources:\n• Faculty office hours for academic help\n• Peer study groups for collaborative learning\n• Online communities for motivation and tips\n• Career counseling for future planning\n\nYou've got this! Every challenge is making you a better programmer! 💻✨`,
       sender: 'bot',
       timestamp: new Date().toISOString(),
       type: 'text'
@@ -342,12 +345,3 @@ export const processStudentMessage = (message: string): ChatMessage => {
     type: 'text'
   };
 };
-    }
-  }
-}
-    }
-  }
-}
-    }
-  }
-}
