@@ -342,6 +342,3 @@ export const processStudentMessage = (message: string): ChatMessage => {
     type: 'text'
   };
 };
-    }
-  }
-}
